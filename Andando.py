@@ -1,7 +1,11 @@
 from PPlay.sprite import Sprite
 from PPlay.window import Window
 from PPlay.gameimage import GameImage
-
+#    /\     |       |--------|
+#   /  \    |       |        |
+#  /    \   |       |--------|
+# /\\\\\\\  |       |
+#/        \ |______ |         
 Tam_x, Tam_y = 1440, 900
 janela = Window(Tam_x, Tam_y)
 janela.set_title("Joguito")
@@ -13,7 +17,7 @@ menu = GameImage("menu.xcf")
 menu_pausa = Sprite("pausa.xcf") 
 menu_pausa.set_position(janela.width / 2 - menu_pausa.width / 2, janela.height / 2 - menu_pausa.height / 2)
 
-vel_x, vel_y, vel_tiro = 500, 500, 800
+vel_x, vel_y, vel_tiro = 300, 300, 800
 branco = (255, 255, 255)
 amarelo = (255, 255, 0)
 
@@ -75,8 +79,40 @@ def da_tiro_E():
     tiroE = Sprite("bala_reverse.png")
     tiroE.set_position(flavia.x - tiroE.width, flavia.y + 40) 
     tirosE.append(tiroE)
-
-#def andar_IA(inimigo):
+lonjura = 60
+vel_i = 150
+def andar_IA(inimigo):
+    if multiplayer:
+        dist_f = abs(inimigo.x - flavia.x) + abs(inimigo.y - flavia.y)
+        dist_w = abs(inimigo.x - wumberto.x) + abs(inimigo.y - wumberto.y)
+        if dist_f < dist_w:
+            if inimigo.x <= flavia.x + lonjura:
+                inimigo.x += vel_i*delta_time
+            if inimigo.x >= flavia.x - flavia.width - lonjura:
+                inimigo.x -= vel_i*delta_time
+            if inimigo.y <= flavia.y + lonjura:
+                inimigo.y += vel_i*delta_time
+            if inimigo.y >= flavia.y - flavia.width - lonjura:
+                inimigo.y -= vel_i*delta_time
+        else:
+            if inimigo.x <= wumberto.x + lonjura:
+                inimigo.x += vel_i*delta_time
+            if inimigo.x >= wumberto.x - flavia.width - lonjura:
+                inimigo.x -= vel_i*delta_time
+            if inimigo.y <= wumberto.y + lonjura:
+                inimigo.y += vel_i*delta_time
+            if inimigo.y >= wumberto.y - flavia.width - lonjura:
+                inimigo.y -= vel_i*delta_time
+    else:
+        if inimigo.x <= flavia.x + lonjura:
+            inimigo.x += vel_i*delta_time
+        if inimigo.x >= flavia.x - flavia.width - lonjura:
+            inimigo.x -= vel_i*delta_time
+        if inimigo.y <= flavia.y + lonjura:
+            inimigo.y += vel_i*delta_time
+        if inimigo.y >= flavia.y - flavia.width - lonjura:
+            inimigo.y -= vel_i*delta_time
+        
 
 
 
@@ -92,8 +128,10 @@ while vedade:
             state = "jogando"
         if teclado.key_pressed("X"):
             personagens = [flavia]
+            multiplayer = False
         if teclado.key_pressed("C"):
             personagens = [flavia, wumberto]
+            multiplayer = True
             
     elif state == "jogando":
         Fundo.draw()
@@ -104,7 +142,7 @@ while vedade:
             fps = n_frames/frames
             frames = 0.0
             n_frames = 0
-#==================================================================================
+        #==================================================================================
         if flavia in personagens:
             anda_generico(flavia, "W", "S", "A", "D", delta_time)
             if teclado.key_pressed("space"):
@@ -129,10 +167,14 @@ while vedade:
             
             if tiro.x + tiro.width <= 0:
                 tirosE.pop(i) 
-#==================================================================================
+        #==================================================================================
+        #==================================================================================
         if wumberto in personagens:    
             anda_generico(wumberto, "UP", "DOWN", "LEFT", "RIGHT", delta_time)
-#==================================================================================
+        #==================================================================================
+        andar_IA(ini1)
+        andar_IA(ini2)
+        andar_IA(ini3)
         if teclado.key_pressed("D"):
             fla_D = True
         if teclado.key_pressed("A"):
