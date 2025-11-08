@@ -15,6 +15,7 @@ menu_pausa.set_position(janela.width / 2 - menu_pausa.width / 2, janela.height /
 
 vel_x, vel_y, vel_tiro, tam = 500, 500, 800, 25
 branco = (255, 255, 255)
+amarelo = (255, 255, 0)
 
 flavia = Sprite("fla.xcf")
 flavia.set_position(900, 400)
@@ -34,8 +35,11 @@ timer = 0
 fla_D, wum_D, vedade = True, True, True
 esc_anterior, space_anterior = False, False
 
+frames = 0.0
+n_frames = 0
 fps = 0
 state = "menu"
+fase = "primeira"
 
 frac_dis_max = 0.66
 
@@ -77,13 +81,20 @@ while vedade:
     
     if state == "menu":
         menu.draw()
+        if teclado.key_pressed("esc"):
+            exit()
         if teclado.key_pressed("Q"):
             state = "jogando"
             
     elif state == "jogando":
         Fundo.draw()
         timer += delta_time
-
+        frames += delta_time
+        n_frames += 1
+        if frames >= 1:
+            fps = n_frames/frames
+            frames = 0.0
+            n_frames = 0
         if teclado.key_pressed("space"):
             if timer >= 0.5:
                 timer = 0
@@ -127,6 +138,7 @@ while vedade:
 
         if esc_atual and not esc_anterior:
             state = "pausa"
+        janela.draw_text(f"FPS: {int(fps)}", 10, 10, size=24, color=(amarelo), bold=True)
             
     elif state == "pausa":
         menu_pausa.draw()
