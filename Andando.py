@@ -13,7 +13,7 @@ menu = GameImage("menu.xcf")
 menu_pausa = Sprite("pausa.xcf") 
 menu_pausa.set_position(janela.width / 2 - menu_pausa.width / 2, janela.height / 2 - menu_pausa.height / 2)
 
-vel_x, vel_y, vel_tiro, tam = 500, 500, 800, 25
+vel_x, vel_y, vel_tiro = 500, 500, 800
 branco = (255, 255, 255)
 amarelo = (255, 255, 0)
 
@@ -28,6 +28,7 @@ ini2.set_position(700, 400)
 ini3 = Sprite("ini3.xcf")
 ini3.set_position(50, 400)
 
+personagens = []
 tirosD = []
 tirosE = []
 timer = 0
@@ -75,6 +76,10 @@ def da_tiro_E():
     tiroE.set_position(flavia.x - tiroE.width, flavia.y + 40) 
     tirosE.append(tiroE)
 
+#def andar_IA(inimigo):
+
+
+
 while vedade:
     delta_time = janela.delta_time()
     esc_atual = teclado.key_pressed("ESC")
@@ -85,6 +90,10 @@ while vedade:
             exit()
         if teclado.key_pressed("Q"):
             state = "jogando"
+        if teclado.key_pressed("X"):
+            personagens = [flavia]
+        if teclado.key_pressed("C"):
+            personagens = [flavia, wumberto]
             
     elif state == "jogando":
         Fundo.draw()
@@ -95,14 +104,16 @@ while vedade:
             fps = n_frames/frames
             frames = 0.0
             n_frames = 0
-        if teclado.key_pressed("space"):
-            if timer >= 0.5:
-                timer = 0
-                if fla_D:
-                    da_tiro_D()
-                else:
-                    da_tiro_E()
-        
+#==================================================================================
+        if flavia in personagens:
+            anda_generico(flavia, "W", "S", "A", "D", delta_time)
+            if teclado.key_pressed("space"):
+                if timer >= 0.5:
+                    timer = 0
+                    if fla_D:
+                        da_tiro_D()
+                    else:
+                        da_tiro_E()
         for i in range(len(tirosD) - 1, -1, -1):
             tiro = tirosD[i]
             tiro.draw()
@@ -118,10 +129,10 @@ while vedade:
             
             if tiro.x + tiro.width <= 0:
                 tirosE.pop(i) 
-
-        anda_generico(flavia, "W", "S", "A", "D", delta_time)
-        anda_generico(wumberto, "UP", "DOWN", "LEFT", "RIGHT", delta_time)
-
+#==================================================================================
+        if wumberto in personagens:    
+            anda_generico(wumberto, "UP", "DOWN", "LEFT", "RIGHT", delta_time)
+#==================================================================================
         if teclado.key_pressed("D"):
             fla_D = True
         if teclado.key_pressed("A"):
@@ -131,19 +142,22 @@ while vedade:
         if teclado.key_pressed("LEFT"):
             wum_D = False
 
-        personagens = [flavia, wumberto, ini1, ini2, ini3]
-        for perssonagem in personagens:
-            n_sai_da_tela(perssonagem)
-            perssonagem.draw()
+        objects = [ini1, ini2, ini3]
+        for object in objects:
+            n_sai_da_tela(object)
+            object.draw()
+        for personagem in personagens:
+            n_sai_da_tela(personagem)
+            personagem.draw()   
 
         if esc_atual and not esc_anterior:
             state = "pausa"
-        janela.draw_text(f"FPS: {int(fps)}", 10, 10, size=24, color=(amarelo), bold=True)
+        janela.draw_text(f"FPS: {int(fps)}", 10, 10, size=10, color=(amarelo), bold=True)
             
     elif state == "pausa":
         menu_pausa.draw()
-        janela.draw_text("Esc para voltar ao jogo", janela.width / 2 - 100, janela.height / 2 + 200, tam, branco, "Calibri", True)
-        janela.draw_text("Espaço para voltar ao menu", janela.width / 2 - 120, janela.height / 2 + 250, tam, branco, "Calibri", True)
+        janela.draw_text("Esc para voltar ao jogo", janela.width / 2 - 100, janela.height / 2 + 150, 20, branco, "Calibri", True)
+        janela.draw_text("Espaço para voltar ao menu", janela.width / 2 - 120, janela.height / 2 + 180, 20, branco, "Calibri", True)
         
         if esc_atual and not esc_anterior:
             state = "jogando"
