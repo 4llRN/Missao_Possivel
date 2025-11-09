@@ -1,11 +1,12 @@
 from PPlay.sprite import Sprite
 from PPlay.window import Window
 from PPlay.gameimage import GameImage
-#    /\     |       |--------|
-#   /  \    |       |        |
-#  /    \   |       |--------|
-# /\\\\\\\  |       |
-#/        \ |______ |         
+import random
+#    /\     |       |--------| |     |    /\
+#   /  \    |       |        | |     |   /  \ 
+#  /    \   |       |--------| |-----|  /    \
+# /\\\\\\\  |       |          |     | /\\\\\\\
+#/        \ |______ |          |     |/        \
 Tam_x, Tam_y = 1440, 900
 janela = Window(Tam_x, Tam_y)
 janela.set_title("Joguito")
@@ -25,17 +26,21 @@ flavia = Sprite("fla.xcf")
 flavia.set_position(900, 400)
 wumberto = Sprite("wum.xcf")
 wumberto.set_position(900, 600)
-ini1 = Sprite("ini1.xcf")
-ini1.set_position(100, 400)
-ini2 = Sprite("ini2.xcf")
-ini2.set_position(700, 400)
-ini3 = Sprite("ini3.xcf")
-ini3.set_position(50, 400)
-
+Soco = Sprite("vazio.png")
+sup_direito, sup_direito2 = 1317, 670
+sup_esquerdo, sup_esquerdo2 = 29, 573
+inf_direito, inf_direito2 = 1332, 526
+inf_esquerdo, inf_esquerdo2 = 19, 689
+spaws = [sup_direito, sup_esquerdo, inf_direito, inf_esquerdo, sup_direito2, sup_esquerdo2, inf_direito2, inf_esquerdo2]
+inimigos = ["ini1.xcf", "ini2.xcf", "ini3.xcf"]
+vidas = []
+inis_ativos = []
 personagens = []
 tirosD = []
 tirosE = []
 timer = 0
+vida_ini = 4
+total_tela = 5
 
 fla_D, wum_D, vedade = True, True, True
 esc_anterior, space_anterior = False, False
@@ -43,6 +48,8 @@ esc_anterior, space_anterior = False, False
 frames = 0.0
 n_frames = 0
 fps = 0
+tempo_passado = 0.0
+ultimo_chamado = 0.0
 state = "menu"
 fase = "primeira"
 
@@ -56,8 +63,7 @@ def anda_generico(objeto, cima, baixo, esquerda, direita, dt):
     if teclado.key_pressed(esquerda):
         objeto.x -= vel_x * dt
     if teclado.key_pressed(direita):
-        objeto.x += vel_x * dt
-        
+        objeto.x += vel_x * dt     
 def n_sai_da_tela(person):
     if person.x <= 0:
         person.x = 0
@@ -69,12 +75,10 @@ def n_sai_da_tela(person):
 
     elif person.y <= janela.height * frac_dis_max - person.height:
         person.y = janela.height * frac_dis_max - person.height
-
 def da_tiro_D():
     tiroD = Sprite("bala.png")
     tiroD.set_position(flavia.x + flavia.width, flavia.y + 40) 
     tirosD.append(tiroD)
-
 def da_tiro_E():
     tiroE = Sprite("bala_reverse.png")
     tiroE.set_position(flavia.x - tiroE.width, flavia.y + 40) 
@@ -112,14 +116,20 @@ def andar_IA(inimigo):
             inimigo.y += vel_i*delta_time
         if inimigo.y >= flavia.y - flavia.width - lonjura:
             inimigo.y -= vel_i*delta_time
-        
-
-
-
+def chama_ini():
+    num_ra = random.randint(0, 2)
+    posi_ra = random.randint(0, 3)
+    ini_random = inimigos[num_ra]
+    ini_gerado = Sprite(ini_random)
+    inis_ativos.append(ini_gerado)
+    ini_gerado.set_position(spaws[posi_ra], spaws[posi_ra+4])
+def da_soco_D():
+    Soco.set_position(wumberto.x + wumberto.width, wumberto.y + 40)
+def da_soco_E():
+    Soco.set_position(wumberto.x - Soco.width, wumberto.y + 40)
 while vedade:
     delta_time = janela.delta_time()
     esc_atual = teclado.key_pressed("ESC")
-    
     if state == "menu":
         menu.draw()
         if teclado.key_pressed("esc"):
@@ -156,25 +166,49 @@ while vedade:
             tiro = tirosD[i]
             tiro.draw()
             tiro.x += vel_tiro * delta_time
-            
             if tiro.x >= janela.width:
                 tirosD.pop(i) 
-                
+            for j in range(len(inis_ativos) -1 , -1, -1):
+                n_amigo = inis_ativos[j]
+                if tiro.collided(n_amigo):
+                    vidas[j] -= 1
+                    if vidas[j] <= 0:
+                        inis_ativos.pop(j)
+                        vidas.pop(j)
+                    tirosD.pop(i)
+                    break     
         for i in range(len(tirosE) - 1, -1, -1):
             tiro = tirosE[i]
             tiro.draw()
             tiro.x -= vel_tiro * delta_time
-            
             if tiro.x + tiro.width <= 0:
                 tirosE.pop(i) 
+            for j in range(len(inis_ativos) -1 , -1, -1):
+                n_amigo = inis_ativos[j]
+                if tiro.collided(n_amigo):
+                    vidas[j] -= 1
+                    if vidas[j] <= 0:
+                        inis_ativos.pop(j)
+                        vidas.pop(j)
+                    tirosE.pop(i)
+                    break
         #==================================================================================
         #==================================================================================
         if wumberto in personagens:    
             anda_generico(wumberto, "UP", "DOWN", "LEFT", "RIGHT", delta_time)
+            if teclado.key_pressed("K"):
+                if wum_D:
+                    da_soco_D()
+                    for i in range(len(inis_ativos)):
+                        if Soco.collided(inis_ativos[i]):
+                            inis_ativos.pop(i)
+                else:
+                    da_soco_E()
+                    for i in range(len(inis_ativos)):
+                        if Soco.collided(inis_ativos[i]):
+                            inis_ativos.pop(i)
         #==================================================================================
-        andar_IA(ini1)
-        andar_IA(ini2)
-        andar_IA(ini3)
+
         if teclado.key_pressed("D"):
             fla_D = True
         if teclado.key_pressed("A"):
@@ -184,10 +218,17 @@ while vedade:
         if teclado.key_pressed("LEFT"):
             wum_D = False
 
-        objects = [ini1, ini2, ini3]
-        for object in objects:
+        tempo_passado += delta_time
+        q_ativos = len(inis_ativos)
+        if q_ativos < total_tela:
+            if (tempo_passado - ultimo_chamado) >= 3.0:
+                chama_ini()
+                ultimo_chamado = tempo_passado
+                vidas.append(vida_ini)
+        for object in inis_ativos:
             n_sai_da_tela(object)
             object.draw()
+            andar_IA(object)
         for personagem in personagens:
             n_sai_da_tela(personagem)
             personagem.draw()   
