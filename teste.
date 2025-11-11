@@ -21,17 +21,21 @@ amarelo = (255, 255, 0)
 
 # ===== Sprites animadas =====
 # Flavia
-fla_direita = Sprite("fla_direita.png", 4)
-fla_esquerda = Sprite("fla_esquerda.png", 4)
+fla_direita = Sprite("fla_dir.png", 8)
+fla_esquerda = Sprite("fla_esq.png", 8)
 fla_direita.set_position(900, 400)
 fla_esquerda.set_position(900, 400)
+fla_direita.set_total_duration(1000)
+fla_esquerda.set_total_duration(1000)
 fla_direcao = "direita"
 
 # Wumberto
-wum_direita = Sprite("wum_direita.png", 4)
-wum_esquerda = Sprite("wum_esquerda.png", 4)
+wum_direita = Sprite("wum_dir.png", 8)
+wum_esquerda = Sprite("wum_esq.png", 8)
 wum_direita.set_position(900, 600)
 wum_esquerda.set_position(900, 600)
+wum_direita.set_total_duration(1000)
+wum_esquerda.set_total_duration(1000)
 wum_direcao = "direita"
 
 # Outros elementos
