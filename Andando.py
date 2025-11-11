@@ -21,7 +21,12 @@ menu_pausa.set_position(janela.width / 2 - menu_pausa.width / 2, janela.height /
 vel_x, vel_y, vel_tiro = 300, 300, 800
 branco = (255, 255, 255)
 amarelo = (255, 255, 0)
-
+'''
+new_fla_D = Sprite("fla_dir.png")
+new_fla_E = Sprite("fla_esq.png")
+new_wum_D = Sprite("wum_dir.png")
+new_wum_E = Sprite("wum_esq.png")
+'''
 flavia = Sprite("fla.xcf")
 flavia.set_position(900, 400)
 wumberto = Sprite("wum.xcf")
@@ -53,6 +58,14 @@ ultimo_chamado = 0.0
 state = "menu"
 fase = "primeira"
 
+Soco_Ativo = False
+tempo_soco = 0.0
+DURACAO_SOCO = 0.15  
+LARGURA_SOCO = 15
+ALTURA_SOCO = 10  
+Soco.width = LARGURA_SOCO
+Soco.height = ALTURA_SOCO
+
 frac_dis_max = 0.66
 
 def anda_generico(objeto, cima, baixo, esquerda, direita, dt):
@@ -83,38 +96,38 @@ def da_tiro_E():
     tiroE = Sprite("bala_reverse.png")
     tiroE.set_position(flavia.x - tiroE.width, flavia.y + 40) 
     tirosE.append(tiroE)
-lonjura = 60
+raio_distância = 60
 vel_i = 150
 def andar_IA(inimigo):
     if multiplayer:
         dist_f = abs(inimigo.x - flavia.x) + abs(inimigo.y - flavia.y)
         dist_w = abs(inimigo.x - wumberto.x) + abs(inimigo.y - wumberto.y)
         if dist_f < dist_w:
-            if inimigo.x <= flavia.x + lonjura:
+            if inimigo.x <= flavia.x + raio_distância:
                 inimigo.x += vel_i*delta_time
-            if inimigo.x >= flavia.x - flavia.width - lonjura:
+            if inimigo.x >= flavia.x - flavia.width - raio_distância:
                 inimigo.x -= vel_i*delta_time
-            if inimigo.y <= flavia.y + lonjura:
+            if inimigo.y <= flavia.y + raio_distância:
                 inimigo.y += vel_i*delta_time
-            if inimigo.y >= flavia.y - flavia.width - lonjura:
+            if inimigo.y >= flavia.y - flavia.width - raio_distância:
                 inimigo.y -= vel_i*delta_time
         else:
-            if inimigo.x <= wumberto.x + lonjura:
+            if inimigo.x <= wumberto.x + raio_distância:
                 inimigo.x += vel_i*delta_time
-            if inimigo.x >= wumberto.x - flavia.width - lonjura:
+            if inimigo.x >= wumberto.x + wumberto.width - raio_distância:
                 inimigo.x -= vel_i*delta_time
-            if inimigo.y <= wumberto.y + lonjura:
+            if inimigo.y <= wumberto.y + raio_distância:
                 inimigo.y += vel_i*delta_time
-            if inimigo.y >= wumberto.y - flavia.width - lonjura:
+            if inimigo.y >= wumberto.y + wumberto.width + raio_distância:
                 inimigo.y -= vel_i*delta_time
     else:
-        if inimigo.x <= flavia.x + lonjura:
+        if inimigo.x <= flavia.x + raio_distância:
             inimigo.x += vel_i*delta_time
-        if inimigo.x >= flavia.x - flavia.width - lonjura:
+        if inimigo.x >= flavia.x - flavia.width - raio_distância:
             inimigo.x -= vel_i*delta_time
-        if inimigo.y <= flavia.y + lonjura:
+        if inimigo.y <= flavia.y + raio_distância:
             inimigo.y += vel_i*delta_time
-        if inimigo.y >= flavia.y - flavia.width - lonjura:
+        if inimigo.y >= flavia.y - flavia.width - raio_distância:
             inimigo.y -= vel_i*delta_time
 def chama_ini():
     num_ra = random.randint(0, 2)
@@ -123,10 +136,13 @@ def chama_ini():
     ini_gerado = Sprite(ini_random)
     inis_ativos.append(ini_gerado)
     ini_gerado.set_position(spaws[posi_ra], spaws[posi_ra+4])
-def da_soco_D():
-    Soco.set_position(wumberto.x + wumberto.width, wumberto.y + 40)
-def da_soco_E():
-    Soco.set_position(wumberto.x - Soco.width, wumberto.y + 40)
+def testa_colisao():
+    for j in range(len(inis_ativos) - 1, -1, -1):
+        inimigo = inis_ativos[j]
+        if Soco.collided(inimigo):
+            inis_ativos.pop(j)
+            vidas.pop(j)
+
 while vedade:
     delta_time = janela.delta_time()
     esc_atual = teclado.key_pressed("ESC")
@@ -197,16 +213,18 @@ while vedade:
         if wumberto in personagens:    
             anda_generico(wumberto, "UP", "DOWN", "LEFT", "RIGHT", delta_time)
             if teclado.key_pressed("K"):
+                Soco_Ativo = True
+                tempo_soco = 0.0
                 if wum_D:
-                    da_soco_D()
-                    for i in range(len(inis_ativos)):
-                        if Soco.collided(inis_ativos[i]):
-                            inis_ativos.pop(i)
+                    Soco.set_position(wumberto.x + wumberto.width + 10, wumberto.y + 30)
                 else:
-                    da_soco_E()
-                    for i in range(len(inis_ativos)):
-                        if Soco.collided(inis_ativos[i]):
-                            inis_ativos.pop(i)
+                    Soco.set_position(wumberto.x - Soco.width +10, wumberto.y + 30)
+        if Soco_Ativo:
+            tempo_soco += delta_time
+            if tempo_soco >= DURACAO_SOCO:
+                Soco_Ativo = False
+            else:
+                testa_colisao()
         #==================================================================================
 
         if teclado.key_pressed("D"):
@@ -249,6 +267,5 @@ while vedade:
         if space_atual and not space_anterior:
              state = "menu"
         space_anterior = space_atual
-
     esc_anterior = esc_atual
     janela.update()
