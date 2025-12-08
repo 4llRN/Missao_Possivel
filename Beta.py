@@ -47,22 +47,33 @@ wumberto = Sprite("assets.wuberto/parado.xcf")
 wumberto.set_position(900, 600)
 
 wumberto_animacoes = {
-    "parado": Sprite("assets.wuberto/parado.xcf"),
-    "cima": Sprite("assets.wuberto/cima.xcf", 5),
-    "baixo": Sprite("assets.wuberto/baixo.xcf", 7),
-    "esquerda": Sprite("assets.wuberto/esquerda.xcf", 4),
-    "direita": Sprite("assets.wuberto/direita.xcf", 4)
+    "anda_esquerda": Sprite("wumb_anim/andando_w (esq).png", 8),
+    "anda_direita": Sprite("wumb_anim/andando_w.png", 8),
+    "toma_esquerda": Sprite("wumb_anim/dano_w (esq).png", 6),
+    "toma_direita": Sprite("wumb_anim/dano_w.png", 6),
+    "parado_esquerda": Sprite("wumb_anim/idle_w (esq).png", 8),
+    "parado_direita": Sprite("wumb_anim/idle_w.png", 8),
+    "da_soco_esquerda": Sprite("wumb_anim/soco_w (esq).png", 5),
+    "da_soco_direita": Sprite("wumb_anim/soco_w.png", 5),
+    "da_tiro_esquerda": Sprite("wumb_anim/tiro_w (esq).png", 4),
+    "da_tiro_direita": Sprite("wumb_anim/tiro_w.png", 4)
 }
 
-wumberto_animacoes["cima"].set_total_duration(1000)
-wumberto_animacoes["baixo"].set_total_duration(1000)
-wumberto_animacoes["esquerda"].set_total_duration(1000)
-wumberto_animacoes["direita"].set_total_duration(1000)
+wumberto_animacoes["parado_esquerda"].set_total_duration(1000)
+wumberto_animacoes["parado_direita"].set_total_duration(1000)
+wumberto_animacoes["toma_esquerda"].set_total_duration(1000)
+wumberto_animacoes["toma_direita"].set_total_duration(1000)
+wumberto_animacoes["anda_esquerda"].set_total_duration(1000)
+wumberto_animacoes["anda_direita"].set_total_duration(1000)
+wumberto_animacoes["da_soco_esquerda"].set_total_duration(1000)
+wumberto_animacoes["da_soco_direita"].set_total_duration(1000)
+wumberto_animacoes["da_tiro_esquerda"].set_total_duration(1000)
+wumberto_animacoes["da_tiro_direita"].set_total_duration(1000)
 
 for animacao in wumberto_animacoes.values():
     animacao.set_position(900, 600)
 
-animacao_atual = "parado"
+animacao_atual = "parado_direita"
 wumberto_atual = wumberto_animacoes[animacao_atual]
 
 # SISTEMA DE DANO E INVENCIBILIDADE
@@ -132,6 +143,7 @@ def reset():
     inis_ativos.clear()
     vidas.clear()
     Frangos.clear()
+    janela.set_background_color((0,0,0))
 
 def anda_generico(objeto, cima, baixo, esquerda, direita, dt):
     if teclado.key_pressed(cima):
@@ -301,17 +313,16 @@ def letras_no_menu_players():
 def atualizar_animacao_wumberto():
     global animacao_atual, wumberto_atual, wum_D
     
-    nova_animacao = "parado"
-    
-    if teclado.key_pressed("UP"):
-        nova_animacao = "cima"
-    elif teclado.key_pressed("DOWN"):
-        nova_animacao = "baixo"
-    elif teclado.key_pressed("LEFT"):
-        nova_animacao = "esquerda"
+    if wum_D:
+        nova_animacao = "parado_direita"
+    else:
+        nova_animacao = "parado_esquerda"
+
+    if teclado.key_pressed("LEFT"):
+        nova_animacao = "anda_esquerda"
         wum_D = False
     elif teclado.key_pressed("RIGHT"):
-        nova_animacao = "direita"
+        nova_animacao = "anda_direita"
         wum_D = True
     
     if nova_animacao != animacao_atual:
