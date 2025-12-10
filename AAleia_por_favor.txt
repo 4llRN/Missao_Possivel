@@ -1,0 +1,2 @@
+Fala professor!! Ou qualquer outro que esteja vendo esse repositório, isso aqui é só uma explicação sobre como esse repositório está organizado, e é simples. Tem muitos arquivos soltos,são como uma linha do tempo, tem bastante lixo e também coisas que só não usamos, daí tivemos a ideia de deixar mais simples de rodar o jogo e colocar a pasta: JOGO_FINAL. Baixando essa pasta é só rodar o arquivo: final2. E esse é o jogo.
+
